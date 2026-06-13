@@ -1,0 +1,14 @@
+{
+  "$schema": "https://knip.dev/schema.json",
+  "ignoreDependencies": ["@types/react", "@types/react-dom"],
+  "workspaces": {
+    "web": {
+      "entry": ["src/main.tsx!", "vite.config.ts", "vitest.config.ts"],
+      "project": ["src/**/*.{ts,tsx}!"]
+    },
+    "worker": {
+      "entry": ["src/index.ts!", "vitest.config.ts"],
+      "project": ["src/**/*.ts!"]
+    }
+  }
+}
