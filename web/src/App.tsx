@@ -1,3 +1,5 @@
+import { PaymentForm } from './components/PaymentForm.tsx';
+
 const App = () => (
   <main className="mx-auto max-w-2xl px-4 py-12">
     <header className="mb-8">
@@ -13,6 +15,8 @@ const App = () => (
         </span>
       </div>
     </header>
+
+    <PaymentForm />
 
     <footer className="mt-10 text-center text-xs text-warm-gray-500">
       Stripe test mode + Adyen checkout-test · part of{' '}
