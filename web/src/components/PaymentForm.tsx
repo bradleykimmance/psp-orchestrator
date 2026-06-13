@@ -1,3 +1,8 @@
+import {
+  CURRENCIES,
+  type Currency,
+  CURRENCY_SYMBOLS,
+} from '../data/currencies.ts';
 import { DEFAULT_TEST_CARD, TEST_CARDS } from '../data/testCards.ts';
 import { authorize, PaymentError } from '../lib/api.ts';
 import {
@@ -7,62 +12,12 @@ import {
   PSP_LABELS,
   PSPS,
 } from '../lib/canonical.ts';
+import { BRAND_LABELS, cardBrand } from '../lib/cardBrand.ts';
+import { formatExpiry, toMMYY } from '../lib/expiry.ts';
+import { toMinorUnits } from '../lib/money.ts';
 import { PayloadViewer } from './PayloadViewer.tsx';
 import { useState } from 'react';
 import * as React from 'react';
-
-const CURRENCIES = ['GBP', 'USD', 'EUR'] as const;
-type Currency = (typeof CURRENCIES)[number];
-
-const CURRENCY_SYMBOLS: Record<Currency, string> = {
-  EUR: '€',
-  GBP: '£',
-  USD: '$',
-};
-
-type CardBrand = 'amex' | 'mastercard' | 'unknown' | 'visa';
-
-const cardBrand = (value: string): CardBrand => {
-  const digits = value.replaceAll(/\D/gu, '');
-
-  if (digits.startsWith('4')) {
-    return 'visa';
-  }
-
-  if (/^(?:5[1-5]|2[2-7])/u.test(digits)) {
-    return 'mastercard';
-  }
-
-  if (/^3[47]/u.test(digits)) {
-    return 'amex';
-  }
-
-  return 'unknown';
-};
-
-const BRAND_LABELS: Record<Exclude<CardBrand, 'unknown'>, string> = {
-  amex: 'Amex',
-  mastercard: 'Mastercard',
-  visa: 'Visa',
-};
-
-const toMinorUnits = (major: string): number =>
-  Math.round(Number(major) * 100);
-
-// Mask keystrokes into 'MM / YY'. A leading month pads to 0X so the slash advances.
-const formatExpiry = (input: string): string => {
-  const digits = input.replaceAll(/\D/gu, '').slice(0, 4);
-  const normalised =
-    digits.length === 1 && Number(digits) > 1 ? `0${digits}` : digits;
-  if (normalised.length <= 2) {
-    return normalised;
-  }
-
-  return `${normalised.slice(0, 2)} / ${normalised.slice(2)}`;
-};
-
-const toMMYY = (display: string): string =>
-  display.replaceAll(/\D/gu, '').slice(0, 4);
 
 type FormState = {
   // Major units as typed, e.g. '42.00'.
