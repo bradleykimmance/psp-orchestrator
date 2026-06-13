@@ -34,21 +34,35 @@ jobs:
 
   deploy-web:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: 'npm'
-      - run: npm ci
+
+      - run: npm ci --legacy-peer-deps
+
       - name: Build web
         run: npm run build
-        env:
-          VITE_WORKER_URL: ${{ vars.VITE_WORKER_URL }}
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
+
+      - name: Update Changelog
+        uses: TriPSs/conventional-changelog-action@v5
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy web/dist --project-name=psp-orchestrator
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          skip-on-empty: true
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
