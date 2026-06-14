@@ -14,9 +14,7 @@
   "vars": {
     "ADYEN_API_URL": "https://checkout-test.adyen.com/v71",
     "STRIPE_API_URL": "https://api.stripe.com/v1",
-    // CORS allow-list for the Pages frontend. Set to the deployed Pages URL in
-    // production; "*" is fine for a public sandbox demo.
-    "ALLOWED_ORIGIN": "*"
+    "ALLOWED_ORIGIN": "https://payments.bradleykimmance.dev"
   }
 
   // Secrets - set once per environment, never committed:
