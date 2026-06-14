@@ -1,0 +1,6 @@
+# Local-dev secrets for `wrangler dev`. Copy to `.dev.vars` (gitignored) and fill
+# in your own sandbox credentials. In production these are set with
+# `wrangler secret put <NAME>` and live encrypted in Cloudflare - never here.
+STRIPE_SECRET_KEY=sk_test_replace_me
+ADYEN_API_KEY=replace_me
+ADYEN_MERCHANT_ACCOUNT=YourSandboxMerchantECOM

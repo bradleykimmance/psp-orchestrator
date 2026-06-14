@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+/* Shared palette with portfolio (bradleykimmance.dev) */
+@theme {
+  --color-espresso-950: #1F1713;
+  --color-espresso-900: #2A211C;
+  --color-espresso-800: #3A2E27;
+  --color-espresso-700: #4A3A31;
+
+  --color-cream-50: #FAF4E8;
+  --color-cream-100: #F3E4C8;
+  --color-cream-200: #E8D2A8;
+
+  --color-gold-300: #E5C276;
+  --color-gold-400: #D6A85A;
+  --color-gold-500: #B98535;
+
+  --color-warm-gray-500: #7A6D64;
+  --color-warm-gray-600: #62564E;
+
+  --font-serif: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
+}
+
+body {
+  @apply bg-cream-50 dark:bg-espresso-950 text-espresso-900 dark:text-cream-50;
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code, pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}

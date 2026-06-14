@@ -1,0 +1,68 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+# Secrets referenced by name only (set in the GitHub repo, never committed):
+#   CLOUDFLARE_API_TOKEN  - scoped token used by wrangler to deploy
+#   CLOUDFLARE_ACCOUNT_ID - Cloudflare account the Worker + Pages live in
+# Repo variable:
+#   VITE_WORKER_URL       - public URL of the deployed Worker, baked into the web build
+#
+# PSP secrets (STRIPE_SECRET_KEY, ADYEN_API_KEY, ADYEN_MERCHANT_ACCOUNT) are NOT
+# set here - they live encrypted in Cloudflare via `wrangler secret put <NAME>`.
+
+jobs:
+  deploy-worker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: worker
+          command: deploy
+
+  deploy-web:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - run: npm ci --legacy-peer-deps
+
+      - name: Build web
+        run: npm run build
+
+      - name: Update Changelog
+        uses: TriPSs/conventional-changelog-action@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          skip-on-empty: true
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
