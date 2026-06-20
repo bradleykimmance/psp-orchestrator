@@ -20,6 +20,30 @@ const isCanonicalResponse = (value: unknown): value is CanonicalResponse =>
   'status' in value &&
   'rawResponse' in value;
 
+// The Worker's 422 body is `{ error, issues: ZodIssue[] }`.
+const firstValidationMessage = (body: unknown): string | undefined => {
+  if (
+    typeof body !== 'object' ||
+    body === null ||
+    !('issues' in body) ||
+    !Array.isArray(body.issues)
+  ) {
+    return undefined;
+  }
+
+  const [first] = body.issues;
+  if (
+    typeof first === 'object' &&
+    first !== null &&
+    'message' in first &&
+    typeof first.message === 'string'
+  ) {
+    return first.message;
+  }
+
+  return undefined;
+};
+
 export const authorize = async (
   request: CanonicalRequest,
 ): Promise<CanonicalResponse> => {
@@ -40,6 +64,11 @@ export const authorize = async (
     // 502s come back as a canonical error body; 4xx are genuine rejections.
     if (isCanonicalResponse(body)) {
       return body;
+    }
+
+    const validationMessage = firstValidationMessage(body);
+    if (validationMessage !== undefined) {
+      throw new PaymentError(validationMessage, body);
     }
 
     throw new PaymentError(
