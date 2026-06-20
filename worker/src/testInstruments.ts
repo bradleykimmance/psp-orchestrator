@@ -30,8 +30,8 @@ const TEST_CARDS = [
   {
     instrument: 'amex-approved',
     pan: '378282246310005',
-    scenario: 'Approved (AMEX)'
-  }
+    scenario: 'Approved (AMEX)',
+  },
 ] as const;
 
 export type TestInstrument = (typeof TEST_CARDS)[number]['instrument'];

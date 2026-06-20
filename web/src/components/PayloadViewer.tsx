@@ -44,7 +44,11 @@ export const PayloadViewer = ({ result }: PayloadViewerProps) => {
   const [tab, setTab] = useState<Tab>('canonical');
 
   const canonicalView = {
-    pspReference: result.pspReference,
+    ...(result.pspReference ? { pspReference: result.pspReference } : {}),
+    ...(result.errorCode ? { errorCode: result.errorCode } : {}),
+    ...(result.errorMessage ? { errorMessage: result.errorMessage } : {}),
+    ...(result.amount ? { amount: result.amount } : {}),
+    ...(result.currency ? { currency: result.currency } : {}),
     status: result.status,
   };
   const shown = tab === 'canonical' ? canonicalView : result.rawResponse;

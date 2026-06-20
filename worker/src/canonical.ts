@@ -42,7 +42,11 @@ export const CanonicalRequestSchema = z
 export type CanonicalRequest = z.infer<typeof CanonicalRequestSchema>;
 
 export type CanonicalResponse = {
-  pspReference: null | string;
+  amount?: number;
+  currency?: string;
+  errorCode?: string;
+  errorMessage?: string;
+  pspReference?: null | string;
   rawResponse: unknown;
   status: CanonicalStatus;
 };

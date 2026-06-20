@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
 export const StripePaymentIntentResponseSchema = z.object({
+  amount: z.int(),
+  currency: z.string(),
   id: z.string(),
   status: z.enum([
     'canceled',

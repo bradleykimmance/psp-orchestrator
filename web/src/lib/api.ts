@@ -18,7 +18,6 @@ const isCanonicalResponse = (value: unknown): value is CanonicalResponse =>
   typeof value === 'object' &&
   value !== null &&
   'status' in value &&
-  'pspReference' in value &&
   'rawResponse' in value;
 
 export const authorize = async (

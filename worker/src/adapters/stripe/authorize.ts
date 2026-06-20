@@ -18,9 +18,9 @@ import {
 // instrument, and Stripe translates that into the `pm_card_*` token that
 // reproduces the same scenario in its sandbox.
 const paymentMethodTokens: Record<TestInstrument, string> = {
+  'amex-approved': 'pm_card_amex',
   'mastercard-approved': 'pm_card_mastercard',
   'visa-approved': 'pm_card_visa',
-  'amex-approved': 'pm_card_amex',
   'visa-declined': 'pm_card_chargeDeclined',
   'visa-insufficient-funds': 'pm_card_chargeDeclinedInsufficientFunds',
 };
@@ -70,6 +70,8 @@ export const stripeAuthorize = async (
   if (ok) {
     const intent = StripePaymentIntentResponseSchema.parse(raw);
     return {
+      amount: intent.amount,
+      currency: intent.currency,
       pspReference: intent.id,
       rawResponse: raw,
       status: statusMap[intent.status],
@@ -78,7 +80,8 @@ export const stripeAuthorize = async (
 
   const { error } = StripeErrorResponseEnvelopeSchema.parse(raw);
   return {
-    pspReference: error.payment_intent?.id ?? null,
+    errorCode: error.code,
+    errorMessage: error.message,
     rawResponse: raw,
     status: error.type === 'card_error' ? 'refused' : 'error',
   };
