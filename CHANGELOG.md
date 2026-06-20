@@ -1,4 +1,19 @@
-# 0.2.0 (2026-06-14)
+# [0.3.0](https://github.com/bradleykimmance/psp-orchestrator/compare/v0.2.0...v0.3.0) (2026-06-20)
+
+
+### Bug Fixes
+
+* pass error code/message and amount/currency to canonical result ([d02e6bc](https://github.com/bradleykimmance/psp-orchestrator/commit/d02e6bc44e438ed50f94ba379a3ea85ef835cf18))
+
+
+### Features
+
+* **web:** add amex test card ([1185d49](https://github.com/bradleykimmance/psp-orchestrator/commit/1185d49171f18fe828946e3ffbd2ade0a3f9dbb0))
+* **worker:** add stripe auth request with payment method and test suite ([cf15142](https://github.com/bradleykimmance/psp-orchestrator/commit/cf1514243c1e01df31e4071433c9660663141889))
+
+
+
+# [0.2.0](https://github.com/bradleykimmance/psp-orchestrator/compare/7c2924cde9af257bda1e356776a5b59cd3d37f39...v0.2.0) (2026-06-14)
 
 
 ### Features
