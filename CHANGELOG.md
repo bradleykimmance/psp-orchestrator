@@ -1,3 +1,12 @@
+## [0.3.1](https://github.com/bradleykimmance/psp-orchestrator/compare/v0.3.0...v0.3.1) (2026-06-20)
+
+
+### Bug Fixes
+
+* **web:** show zod specific errors on frontend ([0b8d539](https://github.com/bradleykimmance/psp-orchestrator/commit/0b8d539b2b06bbed7df29f318248904692935868))
+
+
+
 # [0.3.0](https://github.com/bradleykimmance/psp-orchestrator/compare/v0.2.0...v0.3.0) (2026-06-20)
 
 
