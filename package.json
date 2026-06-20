@@ -18,6 +18,7 @@
     "build": "npm run build --workspace web",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
+    "test:integration": "npm run test:integration --workspaces --if-present",
     "lint": "npm run lint:eslint && npm run lint:knip && npm run typecheck",
     "lint:eslint": "eslint web/src web/test worker/src worker/test",
     "lint:knip": "knip --production",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.12.2",
+    "@vitest/coverage-v8": "^4.1.5",
     "eslint": "^9.39.4",
     "eslint-config-canonical": "^47.4.2",
     "eslint-plugin-react-refresh": "^0.5.2",

@@ -55,11 +55,19 @@ describe('worker route', () => {
   });
 
   it('routes a valid request through the chosen adapter and returns the canonical response', async () => {
-    const response = await call(post(validBody));
+    // Route through Adyen, which is still stubbed, so the route test stays
+    // hermetic (Stripe now makes a live call).
+    const response = await call(
+      post({
+        ...validBody,
+        card: { cvc: '737', expiry: '0327', number: '5555555555554444' },
+        psp: 'adyen',
+      }),
+    );
     expect(response.status).toBe(200);
     const result = await response.json();
     expect(result).toMatchObject({
-      pspReference: 'stripe_stub_ORD-123',
+      pspReference: 'adyen_stub_ORD-123',
       status: 'authorised',
     });
   });

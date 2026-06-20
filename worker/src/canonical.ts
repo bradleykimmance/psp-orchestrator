@@ -1,3 +1,5 @@
+import { type Environment } from './environment.ts';
+import { instrumentForPan } from './testInstruments.ts';
 import { z } from 'zod';
 
 const PSPS = ['stripe', 'adyen'] as const;
@@ -10,27 +12,50 @@ const CardSchema = z.object({
   number: z.string().regex(/^\d{12,19}$/u, 'Card number must be 12-19 digits'),
 });
 
-export const CanonicalRequestSchema = z.object({
-  // Minor units (e.g. 4200 == GBP 42.00).
-  amount: z.number().int().positive(),
-  card: CardSchema,
-  currency: z
-    .string()
-    .length(3)
-    .regex(/^[A-Z]{3}$/u, 'ISO 4217 currency code'),
-  psp: PspSchema,
-  reference: z.string().min(1).max(80),
-});
+export const CanonicalRequestSchema = z
+  .object({
+    // Minor units (e.g. 4200 == GBP 42.00).
+    amount: z.number().int().positive(),
+    card: CardSchema,
+    currency: z
+      .string()
+      .length(3)
+      .regex(/^[A-Z]{3}$/u, 'ISO 4217 currency code'),
+    psp: PspSchema,
+    reference: z.string().min(1).max(80),
+  })
+  // Edge lock-down: resolve the PAN to a canonical instrument here so adapters
+  // never touch a raw card number
+  .transform((request, context) => {
+    const instrument = instrumentForPan(request.card.number);
+    if (instrument === undefined) {
+      context.addIssue({
+        code: 'custom',
+        message: 'Only sandbox test cards are accepted',
+        path: ['card', 'number'],
+      });
+      return z.NEVER;
+    }
+
+    return { ...request, instrument };
+  });
 export type CanonicalRequest = z.infer<typeof CanonicalRequestSchema>;
 
 export type CanonicalResponse = {
-  pspReference: null | string;
+  amount?: number;
+  currency?: string;
+  errorCode?: string;
+  errorMessage?: string;
+  pspReference?: null | string;
   rawResponse: unknown;
   status: CanonicalStatus;
 };
 
 export type PspAdapter = {
-  authorize: (request: CanonicalRequest) => Promise<CanonicalResponse>;
+  readonly authorize: (
+    request: CanonicalRequest,
+    environment: Environment,
+  ) => Promise<CanonicalResponse>;
   readonly id: Psp;
 };
 
