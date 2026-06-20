@@ -48,7 +48,7 @@ export default {
 
     const adapter = adapters[parsed.data.psp];
     try {
-      const result = await adapter.authorize(parsed.data);
+      const result = await adapter.authorize(parsed.data, environment);
       return json(result, 200, cors);
     } catch (error) {
       // Catches transport failures once adapters go live; the stub never throws.
