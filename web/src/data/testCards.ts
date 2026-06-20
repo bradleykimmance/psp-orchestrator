@@ -30,6 +30,14 @@ export const TEST_CARDS: TestCard[] = [
     worksWith: 'both',
   },
   {
+    cvc: '1234',
+    expect: 'authorised',
+    expiry: '0330',
+    label: 'Amex - approved',
+    number: '378282246310005',
+    worksWith: 'both',
+  },
+  {
     cvc: '123',
     expect: 'refused',
     expiry: '1227',
