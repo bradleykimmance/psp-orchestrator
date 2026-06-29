@@ -1,6 +1,5 @@
 import { type CanonicalRequest } from '../src/canonical.ts';
 import { type Environment } from '../src/environment.ts';
-import { instrumentForPan } from '../src/testInstruments.ts';
 
 export const basicRequest = (
   overrides?: Partial<CanonicalRequest>,
@@ -17,12 +16,7 @@ export const basicRequest = (
     reference: 'ORD-123',
   };
 
-  const merged = { ...body, ...overrides };
-
-  return {
-    ...merged,
-    instrument: instrumentForPan(merged.card.number) ?? 'visa-approved',
-  };
+  return { ...body, ...overrides };
 };
 
 export const unitTestEnvironment = {
