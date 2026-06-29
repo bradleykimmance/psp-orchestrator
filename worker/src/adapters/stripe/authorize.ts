@@ -26,7 +26,7 @@ const statusMap: Record<
   succeeded: 'authorised',
 };
 
-const toPaymentIntentBody = (
+const authorizePayload = (
   request: CanonicalRequest,
 ): StripePaymentIntentRequest => {
   const payload = {
@@ -59,7 +59,7 @@ export const stripeAuthorize = async (
   const { ok, raw } = await stripePost(
     environment,
     '/payment_intents',
-    toPaymentIntentBody(request),
+    authorizePayload(request),
   );
 
   if (ok) {

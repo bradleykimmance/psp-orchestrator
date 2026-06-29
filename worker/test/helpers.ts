@@ -9,7 +9,9 @@ export const basicRequest = (
     card: {
       cvc: '123',
       expiry: '1227',
+      name: 'Brad Test',
       number: '4242424242424242',
+      schema: 'visa' as const,
     },
     currency: 'GBP',
     psp: 'stripe' as const,
