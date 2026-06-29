@@ -20,7 +20,12 @@ describe.skipIf(!process.env.STRIPE_SECRET_KEY)(
     it('refuses a declined test card (4000…0002)', async () => {
       const result = await stripeAuthorize(
         basicRequest({
-          card: { cvc: '123', expiry: '1234', number: '4000000000000002' },
+          card: {
+            cvc: '123',
+            expiry: '1234',
+            name: 'Integration Test',
+            number: '4000000000000002',
+          },
         }),
         environment,
       );

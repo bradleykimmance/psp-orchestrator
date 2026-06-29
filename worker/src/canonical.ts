@@ -8,6 +8,7 @@ export type Psp = z.infer<typeof PspSchema>;
 const CardSchema = z.object({
   cvc: z.string().regex(/^\d{3,4}$/u, 'CVC must be 3-4 digits'),
   expiry: z.string().regex(/^(0[1-9]|1[0-2])\d{2}$/u, 'Expiry must be MMYY'),
+  name: z.string().min(1).max(50),
   number: z.string().regex(/^\d{12,19}$/u, 'Card number must be 12-19 digits'),
 });
 
