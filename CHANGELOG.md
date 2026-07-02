@@ -1,3 +1,19 @@
+# [0.4.0](https://github.com/bradleykimmance/psp-orchestrator/compare/v0.3.1...v0.4.0) (2026-07-02)
+
+
+### Bug Fixes
+
+* **stripe:** convert stripe to use plain card details ([b6b5bac](https://github.com/bradleykimmance/psp-orchestrator/commit/b6b5bac443434aa72ec78a5c493465a5ab6c303d))
+
+
+### Features
+
+* **adyen:** add adyen adapter with sandbox card authorisation ([ce73084](https://github.com/bradleykimmance/psp-orchestrator/commit/ce73084f5c16d0f95a0bfba5becbfff2cda9b8b6))
+* **shared:** move canonical contract to shared package and add card name ([20c4b4a](https://github.com/bradleykimmance/psp-orchestrator/commit/20c4b4a63bdfc014b17fb7e831573fe93a5e99fb))
+* **web:** add adyen only test cards and ensure ui auto updates on psp switch ([09df3c1](https://github.com/bradleykimmance/psp-orchestrator/commit/09df3c1ded7963e767669e3128cdc2b5db3e26a7))
+
+
+
 ## [0.3.1](https://github.com/bradleykimmance/psp-orchestrator/compare/v0.3.0...v0.3.1) (2026-06-20)
 
 
