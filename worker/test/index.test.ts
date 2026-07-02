@@ -1,6 +1,6 @@
 import { type Environment } from '../src/environment.ts';
 import worker from '../src/index.ts';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const environment = {
   ADYEN_API_KEY: 'AQEv_test_key',
@@ -16,6 +16,7 @@ const validBody = {
   card: {
     cvc: '123',
     expiry: '1227',
+    name: 'Brad Test',
     number: '4242424242424242',
   },
   currency: 'GBP',
@@ -55,20 +56,41 @@ describe('worker route', () => {
   });
 
   it('routes a valid request through the chosen adapter and returns the canonical response', async () => {
-    // Route through Adyen, which is still stubbed, so the route test stays
-    // hermetic (Stripe now makes a live call).
+    // Both adapters now make real calls, so stub fetch to keep the route test
+    // hermetic. Routing through Adyen exercises the registry -> adapter path.
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(
+      Response.json(
+        {
+          merchantReference: 'ORD-123',
+          pspReference: 'ADYEN_ROUTED',
+          resultCode: 'Authorised',
+        },
+        { status: 200 },
+      ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
     const response = await call(
       post({
         ...validBody,
-        card: { cvc: '737', expiry: '0327', number: '5555555555554444' },
+        card: {
+          cvc: '737',
+          expiry: '0327',
+          name: 'Brad Test',
+          number: '5555555555554444',
+        },
         psp: 'adyen',
       }),
     );
     expect(response.status).toBe(200);
     const result = await response.json();
     expect(result).toMatchObject({
-      pspReference: 'adyen_stub_ORD-123',
+      pspReference: 'ADYEN_ROUTED',
       status: 'authorised',
     });
   });
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });

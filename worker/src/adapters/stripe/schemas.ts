@@ -27,8 +27,16 @@ export const StripePaymentIntentRequestSchema = z.object({
   capture_method: z.literal('manual'),
   confirm: z.literal('true'),
   currency: z.enum(['gbp', 'usd', 'eur']),
-  // A Stripe test payment-method token (`pm_card_*`) instead of plain card number
-  payment_method: z.string().startsWith('pm_'),
+  payment_method_data: z.object({
+    billing_details: z.object({ name: z.string() }),
+    card: z.object({
+      cvc: z.string(),
+      exp_month: z.number().int(),
+      exp_year: z.number().int(),
+      number: z.string(),
+    }),
+    type: z.literal('card'),
+  }),
 });
 export type StripePaymentIntentRequest = z.infer<
   typeof StripePaymentIntentRequestSchema

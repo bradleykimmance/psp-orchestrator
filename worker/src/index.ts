@@ -1,6 +1,6 @@
 import { adapters } from './adapters';
-import { CanonicalRequestSchema } from './canonical.ts';
 import { type Environment } from './environment.ts';
+import { CanonicalRequestSchema } from 'shared/canonical';
 
 const corsHeaders = (environment: Environment): Record<string, string> => ({
   'access-control-allow-headers': 'content-type',
@@ -51,7 +51,6 @@ export default {
       const result = await adapter.authorize(parsed.data, environment);
       return json(result, 200, cors);
     } catch (error) {
-      // Catches transport failures once adapters go live; the stub never throws.
       return json(
         {
           pspReference: null,

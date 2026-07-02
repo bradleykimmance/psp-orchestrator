@@ -1,9 +1,4 @@
-import {
-  type CanonicalRequest,
-  type CanonicalResponse,
-} from '../../canonical.ts';
 import { type Environment } from '../../environment.ts';
-import { type TestInstrument } from '../../testInstruments.ts';
 import { stripePost } from './client.ts';
 import {
   StripeErrorResponseEnvelopeSchema,
@@ -12,18 +7,10 @@ import {
   type StripePaymentIntentResponse,
   StripePaymentIntentResponseSchema,
 } from './schemas.ts';
-
-// Canonical instrument -> Stripe test payment-method token. This is the
-// adapter's half of the mapping: the edge resolves a test PAN to a canonical
-// instrument, and Stripe translates that into the `pm_card_*` token that
-// reproduces the same scenario in its sandbox.
-const paymentMethodTokens: Record<TestInstrument, string> = {
-  'amex-approved': 'pm_card_amex',
-  'mastercard-approved': 'pm_card_mastercard',
-  'visa-approved': 'pm_card_visa',
-  'visa-declined': 'pm_card_chargeDeclined',
-  'visa-insufficient-funds': 'pm_card_chargeDeclinedInsufficientFunds',
-};
+import {
+  type CanonicalRequest,
+  type CanonicalResponse,
+} from 'shared/canonical';
 
 // Stripe PaymentIntent status -> canonical status.
 const statusMap: Record<
@@ -39,7 +26,7 @@ const statusMap: Record<
   succeeded: 'authorised',
 };
 
-const toPaymentIntentBody = (
+const authorizePayload = (
   request: CanonicalRequest,
 ): StripePaymentIntentRequest => {
   const payload = {
@@ -51,7 +38,16 @@ const toPaymentIntentBody = (
     capture_method: 'manual',
     confirm: 'true',
     currency: request.currency.toLowerCase(),
-    payment_method: paymentMethodTokens[request.instrument],
+    payment_method_data: {
+      billing_details: { name: request.card.name },
+      card: {
+        cvc: request.card.cvc,
+        exp_month: Number(request.card.expiry.slice(0, 2)),
+        exp_year: 2_000 + Number(request.card.expiry.slice(2, 4)),
+        number: request.card.number,
+      },
+      type: 'card',
+    },
   };
 
   return StripePaymentIntentRequestSchema.parse(payload);
@@ -64,7 +60,7 @@ export const stripeAuthorize = async (
   const { ok, raw } = await stripePost(
     environment,
     '/payment_intents',
-    toPaymentIntentBody(request),
+    authorizePayload(request),
   );
 
   if (ok) {

@@ -3,21 +3,20 @@ import {
   type Currency,
   CURRENCY_SYMBOLS,
 } from '../data/currencies.ts';
+import { PSP_LABELS } from '../data/psps.ts';
 import { DEFAULT_TEST_CARD, TEST_CARDS } from '../data/testCards.ts';
 import { authorize, PaymentError } from '../lib/api.ts';
-import {
-  type CanonicalRequest,
-  type CanonicalResponse,
-  type Psp,
-  PSP_LABELS,
-  PSPS,
-} from '../lib/canonical.ts';
 import { BRAND_LABELS, cardBrand } from '../lib/cardBrand.ts';
 import { formatExpiry, toMMYY } from '../lib/expiry.ts';
 import { toMinorUnits } from '../lib/money.ts';
 import { PayloadViewer } from './PayloadViewer.tsx';
 import { useState } from 'react';
 import * as React from 'react';
+import {
+  type CanonicalRequest,
+  type CanonicalResponse,
+} from 'shared/canonical';
+import { type Psp, PSPS } from 'shared/psps';
 
 type FormState = {
   // Major units as typed, e.g. '42.00'.
@@ -26,6 +25,7 @@ type FormState = {
   cvc: string;
   // Display value, e.g. '12 / 27'.
   expiry: string;
+  name: string;
   number: string;
   psp: Psp;
   reference: string;
@@ -36,6 +36,7 @@ const INITIAL: FormState = {
   currency: 'GBP',
   cvc: DEFAULT_TEST_CARD.cvc,
   expiry: formatExpiry(DEFAULT_TEST_CARD.expiry),
+  name: 'Brad Test',
   number: DEFAULT_TEST_CARD.number,
   psp: 'stripe',
   reference: 'ORD-123',
@@ -74,6 +75,7 @@ const toCanonical = (form: FormState): CanonicalRequest => ({
   card: {
     cvc: form.cvc,
     expiry: toMMYY(form.expiry),
+    name: form.name.trim(),
     number: form.number.replaceAll(/\s/gu, ''),
   },
   currency: form.currency,
@@ -92,6 +94,13 @@ export const PaymentForm = () => {
 
   const brand = cardBrand(form.number);
 
+  const selectedTestCard = TEST_CARDS.find(
+    (card) =>
+      card.number === form.number.replaceAll(/\s/gu, '') &&
+      card.cvc === form.cvc &&
+      card.expiry === toMMYY(form.expiry),
+  );
+
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((previous) => ({ ...previous, [key]: value }));
   };
@@ -108,6 +117,39 @@ export const PaymentForm = () => {
       expiry: formatExpiry(card.expiry),
       number: card.number,
     }));
+  };
+
+  const changePsp = (psp: Psp) => {
+    setForm((previous) => {
+      const current = TEST_CARDS.find(
+        (card) => card.number === previous.number.replaceAll(/\s/gu, ''),
+      );
+      if (
+        !current ||
+        current.worksWith === 'both' ||
+        current.worksWith === psp
+      ) {
+        return { ...previous, psp };
+      }
+
+      const replacement = TEST_CARDS.find(
+        (card) =>
+          card.worksWith === psp &&
+          card.expect === current.expect &&
+          cardBrand(card.number) === cardBrand(current.number),
+      );
+      if (!replacement) {
+        return { ...previous, psp };
+      }
+
+      return {
+        ...previous,
+        cvc: replacement.cvc,
+        expiry: formatExpiry(replacement.expiry),
+        number: replacement.number,
+        psp,
+      };
+    });
   };
 
   const onSubmit = async (event: React.SubmitEvent) => {
@@ -140,7 +182,7 @@ export const PaymentForm = () => {
             className={INPUT_CLASS}
             id="psp"
             onChange={(event) => {
-              update('psp', event.target.value as Psp);
+              changePsp(event.target.value as Psp);
             }}
             value={form.psp}
           >
@@ -216,6 +258,21 @@ export const PaymentForm = () => {
           <SectionHeading>Card details</SectionHeading>
 
           <Field
+            htmlFor="name"
+            label="Name on card"
+          >
+            <input
+              autoComplete="cc-name"
+              className={INPUT_CLASS}
+              id="name"
+              onChange={(event) => {
+                update('name', event.target.value);
+              }}
+              value={form.name}
+            />
+          </Field>
+
+          <Field
             htmlFor="number"
             label="Card number"
           >
@@ -281,9 +338,17 @@ export const PaymentForm = () => {
             Sandbox test cards
           </legend>
           <div className="flex flex-wrap gap-2">
-            {TEST_CARDS.map((card) => (
+            {TEST_CARDS.filter(
+              (card) =>
+                card.worksWith === 'both' || card.worksWith === form.psp,
+            ).map((card) => (
               <button
-                className="rounded-full border border-cream-200 px-3 py-1 text-xs hover:border-gold-400 dark:border-espresso-700"
+                aria-pressed={card === selectedTestCard}
+                className={
+                  card === selectedTestCard
+                    ? 'cursor-pointer rounded-full border border-gold-400 bg-gold-500/10 px-3 py-1 text-xs font-semibold'
+                    : 'cursor-pointer rounded-full border border-cream-200 px-3 py-1 text-xs hover:border-gold-400 dark:border-espresso-700'
+                }
                 key={card.number}
                 onClick={() => {
                   applyTestCard(card.number);
@@ -297,7 +362,7 @@ export const PaymentForm = () => {
         </fieldset>
 
         <button
-          className="w-full rounded-lg bg-gold-500 px-4 py-2.5 font-semibold text-espresso-950 transition hover:bg-gold-400 disabled:opacity-60"
+          className="w-full cursor-pointer rounded-lg bg-gold-500 px-4 py-2.5 font-semibold text-espresso-950 transition hover:bg-gold-400 disabled:cursor-default disabled:opacity-60"
           disabled={pending}
           type="submit"
         >

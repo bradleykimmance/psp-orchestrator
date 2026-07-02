@@ -9,6 +9,7 @@
     "npm": "11.x.x"
   },
   "workspaces": [
+    "shared",
     "web",
     "worker"
   ],
@@ -20,9 +21,9 @@
     "test": "npm run test --workspaces --if-present",
     "test:integration": "npm run test:integration --workspaces --if-present",
     "lint": "npm run lint:eslint && npm run lint:knip && npm run typecheck",
-    "lint:eslint": "eslint web/src web/test worker/src worker/test",
+    "lint:eslint": "eslint shared/src web/src web/test worker/src worker/test",
     "lint:knip": "knip --production",
-    "lint:fix": "eslint --fix web/src web/test worker/src worker/test",
+    "lint:fix": "eslint --fix shared/src web/src web/test worker/src worker/test",
     "deploy:worker": "npm run deploy --workspace worker"
   },
   "devDependencies": {
