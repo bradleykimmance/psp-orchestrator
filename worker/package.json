@@ -10,6 +10,7 @@
     "test:integration": "vitest run --project integration"
   },
   "dependencies": {
+    "shared": "*",
     "zod": "^4.1.5"
   },
   "devDependencies": {

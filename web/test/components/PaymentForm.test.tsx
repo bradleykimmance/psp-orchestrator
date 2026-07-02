@@ -22,6 +22,7 @@ describe('PaymentForm', () => {
       '4242424242424242',
     );
     expect(screen.getByLabelText(/expiry/iu)).toHaveValue('12 / 27');
+    expect(screen.getByLabelText(/name on card/iu)).toHaveValue('Brad Test');
   });
 
   it('sends the canonical request and renders both canonical and raw views', async () => {
@@ -51,6 +52,7 @@ describe('PaymentForm', () => {
     });
     expect(sent.card).toMatchObject({
       expiry: '1227',
+      name: 'Brad Test',
       number: '4242424242424242',
     });
 

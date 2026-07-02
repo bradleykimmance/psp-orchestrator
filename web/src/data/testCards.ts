@@ -1,4 +1,4 @@
-import { type Psp } from '../lib/canonical.ts';
+import { type Psp } from 'shared/psps';
 
 // Public sandbox test cards from the Stripe/Adyen docs. Not real PANs.
 export type TestCard = {

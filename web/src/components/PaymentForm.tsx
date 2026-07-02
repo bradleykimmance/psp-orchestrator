@@ -3,21 +3,20 @@ import {
   type Currency,
   CURRENCY_SYMBOLS,
 } from '../data/currencies.ts';
+import { PSP_LABELS } from '../data/psps.ts';
 import { DEFAULT_TEST_CARD, TEST_CARDS } from '../data/testCards.ts';
 import { authorize, PaymentError } from '../lib/api.ts';
-import {
-  type CanonicalRequest,
-  type CanonicalResponse,
-  type Psp,
-  PSP_LABELS,
-  PSPS,
-} from '../lib/canonical.ts';
 import { BRAND_LABELS, cardBrand } from '../lib/cardBrand.ts';
 import { formatExpiry, toMMYY } from '../lib/expiry.ts';
 import { toMinorUnits } from '../lib/money.ts';
 import { PayloadViewer } from './PayloadViewer.tsx';
 import { useState } from 'react';
 import * as React from 'react';
+import {
+  type CanonicalRequest,
+  type CanonicalResponse,
+} from 'shared/canonical';
+import { type Psp, PSPS } from 'shared/psps';
 
 type FormState = {
   // Major units as typed, e.g. '42.00'.
@@ -26,6 +25,7 @@ type FormState = {
   cvc: string;
   // Display value, e.g. '12 / 27'.
   expiry: string;
+  name: string;
   number: string;
   psp: Psp;
   reference: string;
@@ -36,6 +36,7 @@ const INITIAL: FormState = {
   currency: 'GBP',
   cvc: DEFAULT_TEST_CARD.cvc,
   expiry: formatExpiry(DEFAULT_TEST_CARD.expiry),
+  name: 'Brad Test',
   number: DEFAULT_TEST_CARD.number,
   psp: 'stripe',
   reference: 'ORD-123',
@@ -74,6 +75,7 @@ const toCanonical = (form: FormState): CanonicalRequest => ({
   card: {
     cvc: form.cvc,
     expiry: toMMYY(form.expiry),
+    name: form.name.trim(),
     number: form.number.replaceAll(/\s/gu, ''),
   },
   currency: form.currency,
@@ -214,6 +216,21 @@ export const PaymentForm = () => {
 
         <section className="space-y-4">
           <SectionHeading>Card details</SectionHeading>
+
+          <Field
+            htmlFor="name"
+            label="Name on card"
+          >
+            <input
+              autoComplete="cc-name"
+              className={INPUT_CLASS}
+              id="name"
+              onChange={(event) => {
+                update('name', event.target.value);
+              }}
+              value={form.name}
+            />
+          </Field>
 
           <Field
             htmlFor="number"

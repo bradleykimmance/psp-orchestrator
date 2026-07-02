@@ -1,7 +1,3 @@
-import {
-  type CanonicalRequest,
-  type CanonicalResponse,
-} from '../../canonical.ts';
 import { type Environment } from '../../environment.ts';
 import { adyenPost } from './client.ts';
 import {
@@ -10,6 +6,10 @@ import {
   AdyenPaymentRequestSchema,
   AdyenPaymentResponseSchema,
 } from './schemas.ts';
+import {
+  type CanonicalRequest,
+  type CanonicalResponse,
+} from 'shared/canonical';
 
 // 1 = Authorised, 2 = Refused, 12 = Not enough balance.
 const testAcquirerResponseCodeByPan: Record<string, string> = {

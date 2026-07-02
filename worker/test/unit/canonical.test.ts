@@ -1,5 +1,5 @@
-import { CanonicalRequestSchema } from '../../src/canonical.ts';
 import { basicRequest } from '../helpers.ts';
+import { CanonicalRequestSchema } from 'shared/canonical';
 import { describe, expect, it } from 'vitest';
 
 describe('CanonicalRequestSchema', () => {

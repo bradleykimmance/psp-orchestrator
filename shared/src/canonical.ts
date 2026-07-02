@@ -1,9 +1,7 @@
-import { type Environment } from './environment.ts';
+import { PSPS } from './psps.ts';
 import { z } from 'zod';
 
-const PSPS = ['stripe', 'adyen'] as const;
 const PspSchema = z.enum(PSPS);
-export type Psp = z.infer<typeof PspSchema>;
 
 const CardSchema = z.object({
   cvc: z.string().regex(/^\d{3,4}$/u, 'CVC must be 3-4 digits'),
@@ -35,12 +33,4 @@ export type CanonicalResponse = {
   status: CanonicalStatus;
 };
 
-export type PspAdapter = {
-  readonly authorize: (
-    request: CanonicalRequest,
-    environment: Environment,
-  ) => Promise<CanonicalResponse>;
-  readonly id: Psp;
-};
-
-type CanonicalStatus = 'authorised' | 'error' | 'pending' | 'refused';
+export type CanonicalStatus = 'authorised' | 'error' | 'pending' | 'refused';

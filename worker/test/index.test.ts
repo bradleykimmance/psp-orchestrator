@@ -78,7 +78,6 @@ describe('worker route', () => {
           expiry: '0327',
           name: 'Brad Test',
           number: '5555555555554444',
-          schema: 'mastercard',
         },
         psp: 'adyen',
       }),

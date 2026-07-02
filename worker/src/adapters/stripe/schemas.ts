@@ -28,6 +28,7 @@ export const StripePaymentIntentRequestSchema = z.object({
   confirm: z.literal('true'),
   currency: z.enum(['gbp', 'usd', 'eur']),
   payment_method_data: z.object({
+    billing_details: z.object({ name: z.string() }),
     card: z.object({
       cvc: z.string(),
       exp_month: z.number().int(),

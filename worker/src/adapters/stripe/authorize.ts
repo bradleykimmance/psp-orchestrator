@@ -1,7 +1,3 @@
-import {
-  type CanonicalRequest,
-  type CanonicalResponse,
-} from '../../canonical.ts';
 import { type Environment } from '../../environment.ts';
 import { stripePost } from './client.ts';
 import {
@@ -11,6 +7,10 @@ import {
   type StripePaymentIntentResponse,
   StripePaymentIntentResponseSchema,
 } from './schemas.ts';
+import {
+  type CanonicalRequest,
+  type CanonicalResponse,
+} from 'shared/canonical';
 
 // Stripe PaymentIntent status -> canonical status.
 const statusMap: Record<
@@ -39,6 +39,7 @@ const authorizePayload = (
     confirm: 'true',
     currency: request.currency.toLowerCase(),
     payment_method_data: {
+      billing_details: { name: request.card.name },
       card: {
         cvc: request.card.cvc,
         exp_month: Number(request.card.expiry.slice(0, 2)),

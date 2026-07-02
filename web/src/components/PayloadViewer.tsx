@@ -1,8 +1,5 @@
-import {
-  type CanonicalResponse,
-  type CanonicalStatus,
-} from '../lib/canonical.ts';
 import { useState } from 'react';
+import { type CanonicalResponse, type CanonicalStatus } from 'shared/canonical';
 
 const STATUS_STYLES: Record<CanonicalStatus, string> = {
   authorised: 'bg-green-500',

@@ -54,6 +54,7 @@ describe('stripeAdapter authorize', () => {
       capture_method: 'manual',
       confirm: 'true',
       currency: 'gbp',
+      'payment_method_data[billing_details][name]': 'Brad Test',
       'payment_method_data[card][cvc]': '123',
       'payment_method_data[card][exp_month]': '12',
       'payment_method_data[card][exp_year]': '2027',

@@ -1,5 +1,5 @@
-import { type CanonicalRequest } from '../src/canonical.ts';
 import { type Environment } from '../src/environment.ts';
+import { type CanonicalRequest } from 'shared/canonical';
 
 export const basicRequest = (
   overrides?: Partial<CanonicalRequest>,

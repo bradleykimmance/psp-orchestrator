@@ -30,6 +30,11 @@ The route doesn't do anything PSP-specific. It validates the request, picks an
 adapter from a registry, and returns the result. All the provider details live
 behind the `PspAdapter` interface.
 
+The canonical contract itself (zod schema + inferred types) lives in a
+`shared/` workspace imported by both sides, so the web app and the Worker
+can't drift apart. The web app only imports the types (and the PSP list),
+so zod stays out of the browser bundle.
+
 ## Stripe vs Adyen
 
 The two model the same authorisation pretty differently, and the adapters hide
@@ -54,7 +59,7 @@ for Stripe but goes through raw to Adyen.
   "psp": "adyen",
   "amount": 4200,
   "currency": "GBP",
-  "card": { "number": "5555555555554444", "expiry": "0330", "cvc": "737" },
+  "card": { "number": "5555555555554444", "expiry": "0330", "cvc": "737", "name": "Brad Test" },
   "reference": "ORD-123"
 }
 ```

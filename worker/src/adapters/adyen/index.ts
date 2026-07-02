@@ -1,4 +1,4 @@
-import { type PspAdapter } from '../../canonical.ts';
+import { type PspAdapter } from '../types.ts';
 import { adyenAuthorize } from './authorize.ts';
 
 export const adyenAdapter: PspAdapter = {

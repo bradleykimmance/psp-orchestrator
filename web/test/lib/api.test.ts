@@ -1,10 +1,15 @@
 import { authorize, PaymentError } from '../../src/lib/api.ts';
-import { type CanonicalRequest } from '../../src/lib/canonical.ts';
+import { type CanonicalRequest } from 'shared/canonical';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const request: CanonicalRequest = {
   amount: 4_200,
-  card: { cvc: '123', expiry: '1227', number: '4242424242424242' },
+  card: {
+    cvc: '123',
+    expiry: '1227',
+    name: 'Brad Test',
+    number: '4242424242424242',
+  },
   currency: 'GBP',
   psp: 'stripe',
   reference: 'ORD-123',

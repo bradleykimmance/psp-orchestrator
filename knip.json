@@ -2,6 +2,10 @@
   "$schema": "https://knip.dev/schema.json",
   "ignoreDependencies": ["@types/react", "@types/react-dom"],
   "workspaces": {
+    "shared": {
+      "entry": ["src/canonical.ts!", "src/psps.ts!"],
+      "project": ["src/**/*.ts!"]
+    },
     "web": {
       "entry": ["src/main.tsx!", "vite.config.ts", "vitest.config.ts"],
       "project": ["src/**/*.{ts,tsx}!"]
