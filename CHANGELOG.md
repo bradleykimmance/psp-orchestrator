@@ -1,3 +1,12 @@
+# [0.5.0](https://github.com/bradleykimmance/psp-orchestrator/compare/v0.4.0...v0.5.0) (2026-07-02)
+
+
+### Features
+
+* add idempotency key from browser to psp request ([e418094](https://github.com/bradleykimmance/psp-orchestrator/commit/e418094b977fca6051af872ba34ad6ac24ff5a7d))
+
+
+
 # [0.4.0](https://github.com/bradleykimmance/psp-orchestrator/compare/v0.3.1...v0.4.0) (2026-07-02)
 
 
