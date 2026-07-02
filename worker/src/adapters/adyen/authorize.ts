@@ -68,6 +68,7 @@ export const adyenAuthorize = async (
     environment,
     '/payments',
     authorizePayload(request, environment),
+    request.idempotencyKey,
   );
 
   if (!ok) {

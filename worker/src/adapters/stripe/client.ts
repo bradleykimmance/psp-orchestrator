@@ -20,6 +20,7 @@ export const stripePost = async (
   environment: Environment,
   path: string,
   body: StripePaymentIntentRequest,
+  idempotencyKey: string,
 ): Promise<{ ok: boolean; raw: unknown }> => {
   // Stripe is form post, change encoding here from json to form
   const response = await fetch(`${environment.STRIPE_API_URL}${path}`, {
@@ -27,6 +28,8 @@ export const stripePost = async (
     headers: {
       authorization: `Bearer ${environment.STRIPE_SECRET_KEY}`,
       'content-type': 'application/x-www-form-urlencoded',
+      // Stripe replays the original response for a reused key (24h window)
+      'idempotency-key': idempotencyKey,
     },
     method: 'POST',
   });

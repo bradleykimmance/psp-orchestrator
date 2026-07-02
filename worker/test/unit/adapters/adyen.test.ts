@@ -54,6 +54,7 @@ describe('adyenAdapter authorize', () => {
     expect(init?.method).toBe('POST');
     expect(init?.headers).toMatchObject({
       'content-type': 'application/json',
+      'idempotency-key': '7f0d0f2e-9d3a-4b6c-8a1e-2c5f4d7b9e01',
       'x-api-key': 'Adyen_test_key',
     });
 

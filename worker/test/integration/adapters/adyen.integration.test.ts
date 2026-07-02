@@ -21,6 +21,7 @@ describe.skipIf(
           name: 'Brad Test',
           number: '4111111111111111',
         },
+        idempotencyKey: crypto.randomUUID(),
       }),
       environment,
     );
@@ -38,6 +39,7 @@ describe.skipIf(
           name: 'Brad Test',
           number: '4000000000000002',
         },
+        idempotencyKey: crypto.randomUUID(),
       }),
       environment,
     );

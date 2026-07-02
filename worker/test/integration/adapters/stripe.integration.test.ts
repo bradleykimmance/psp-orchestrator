@@ -12,7 +12,10 @@ describe.skipIf(!process.env.STRIPE_SECRET_KEY)(
   'stripe authorize (live sandbox)',
   () => {
     it('authorises a 4242 test card', async () => {
-      const result = await stripeAuthorize(basicRequest(), environment);
+      const result = await stripeAuthorize(
+        basicRequest({ idempotencyKey: crypto.randomUUID() }),
+        environment,
+      );
       expect(result.status).toBe('authorised');
       expect(result.pspReference).toMatch(/^pi_/u);
     });
@@ -26,6 +29,7 @@ describe.skipIf(!process.env.STRIPE_SECRET_KEY)(
             name: 'Integration Test',
             number: '4000000000000002',
           },
+          idempotencyKey: crypto.randomUUID(),
         }),
         environment,
       );

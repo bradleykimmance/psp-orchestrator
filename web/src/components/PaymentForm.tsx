@@ -70,7 +70,10 @@ const SectionHeading = ({
   </h2>
 );
 
-const toCanonical = (form: FormState): CanonicalRequest => ({
+const toCanonical = (
+  form: FormState,
+  idempotencyKey: string,
+): CanonicalRequest => ({
   amount: toMinorUnits(form.amount),
   card: {
     cvc: form.cvc,
@@ -79,6 +82,7 @@ const toCanonical = (form: FormState): CanonicalRequest => ({
     number: form.number.replaceAll(/\s/gu, ''),
   },
   currency: form.currency,
+  idempotencyKey,
   psp: form.psp,
   reference: form.reference,
 });
@@ -91,6 +95,13 @@ export const PaymentForm = () => {
   const [result, setResult] = useState<CanonicalResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState<null | string>(null);
   const [pending, setPending] = useState(false);
+  const [idempotencyKey, setIdempotencyKey] = useState<string>(() =>
+    crypto.randomUUID(),
+  );
+
+  const rotateIdempotencyKey = () => {
+    setIdempotencyKey(crypto.randomUUID());
+  };
 
   const brand = cardBrand(form.number);
 
@@ -102,6 +113,7 @@ export const PaymentForm = () => {
   );
 
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) => {
+    rotateIdempotencyKey();
     setForm((previous) => ({ ...previous, [key]: value }));
   };
 
@@ -111,6 +123,7 @@ export const PaymentForm = () => {
       return;
     }
 
+    rotateIdempotencyKey();
     setForm((previous) => ({
       ...previous,
       cvc: card.cvc,
@@ -120,6 +133,7 @@ export const PaymentForm = () => {
   };
 
   const changePsp = (psp: Psp) => {
+    rotateIdempotencyKey();
     setForm((previous) => {
       const current = TEST_CARDS.find(
         (card) => card.number === previous.number.replaceAll(/\s/gu, ''),
@@ -158,7 +172,12 @@ export const PaymentForm = () => {
     setErrorMessage(null);
     setResult(null);
     try {
-      setResult(await authorize(toCanonical(form)));
+      const response = await authorize(toCanonical(form, idempotencyKey));
+      setResult(response);
+
+      if (response.status !== 'error') {
+        rotateIdempotencyKey();
+      }
     } catch (error) {
       setErrorMessage(
         error instanceof PaymentError ? error.message : 'Something went wrong.',

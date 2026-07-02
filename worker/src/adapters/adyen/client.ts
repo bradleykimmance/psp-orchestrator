@@ -5,11 +5,14 @@ export const adyenPost = async (
   environment: Environment,
   path: string,
   body: AdyenPaymentRequest,
+  idempotencyKey: string,
 ): Promise<{ ok: boolean; raw: unknown }> => {
   const response = await fetch(`${environment.ADYEN_API_URL}${path}`, {
     body: JSON.stringify(body),
     headers: {
       'content-type': 'application/json',
+      // Adyen returns the original response for a reused key (~7 days)
+      'idempotency-key': idempotencyKey,
       'x-api-key': environment.ADYEN_API_KEY,
     },
     method: 'POST',
