@@ -33,6 +33,20 @@ describe('CanonicalRequestSchema', () => {
     expect(result.success).toBe(false);
   });
 
+  it('requires a UUID idempotency key', () => {
+    expect(
+      CanonicalRequestSchema.safeParse(
+        basicRequest({ idempotencyKey: 'not-a-uuid' }),
+      ).success,
+    ).toBe(false);
+    expect(
+      CanonicalRequestSchema.safeParse({
+        ...basicRequest(),
+        idempotencyKey: undefined,
+      }).success,
+    ).toBe(false);
+  });
+
   it('requires a 3-letter uppercase currency', () => {
     expect(
       CanonicalRequestSchema.safeParse(basicRequest({ currency: 'gbp' }))

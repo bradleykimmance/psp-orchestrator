@@ -18,6 +18,7 @@ export const CanonicalRequestSchema = z.object({
     .string()
     .length(3)
     .regex(/^[A-Z]{3}$/u, 'ISO 4217 currency code'),
+  idempotencyKey: z.uuid(),
   psp: PspSchema,
   reference: z.string().min(1).max(80),
 });

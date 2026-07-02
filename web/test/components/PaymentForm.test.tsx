@@ -55,6 +55,9 @@ describe('PaymentForm', () => {
       name: 'Brad Test',
       number: '4242424242424242',
     });
+    expect(sent.idempotencyKey).toMatch(
+      /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/u,
+    );
 
     fireEvent.click(screen.getByRole('tab', { name: /raw psp/iu }));
     expect(screen.getByText(/"object": "payment_intent"/u)).toBeInTheDocument();
@@ -110,6 +113,77 @@ describe('PaymentForm', () => {
       target: { value: '999' },
     });
     expect(visaChip).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('reuses the idempotency key on retry after a transport failure and rotates it after an outcome', async () => {
+    const canonical = {
+      pspReference: 'pi_1',
+      rawResponse: {},
+      status: 'authorised',
+    };
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockImplementation(
+        async () => ({ json: async () => canonical, ok: true }) as Response,
+      );
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<PaymentForm />);
+    const submit = screen.getByRole('button', { name: /authorise/iu });
+
+    fireEvent.click(submit);
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+    });
+
+    fireEvent.click(submit);
+    await waitFor(() => {
+      expect(screen.getByText(/"status": "authorised"/u)).toBeInTheDocument();
+    });
+
+    fireEvent.click(submit);
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+    });
+
+    const [retryKey, outcomeKey, freshKey] = fetchMock.mock.calls.map(
+      ([, init]) =>
+        (JSON.parse(String(init?.body)) as Record<string, unknown>)
+          .idempotencyKey,
+    );
+    expect(outcomeKey).toBe(retryKey);
+    expect(freshKey).not.toBe(outcomeKey);
+  });
+
+  it('rotates the idempotency key when a field is edited', async () => {
+    const fetchMock = vi.fn<typeof fetch>(async () => {
+      throw new Error('offline');
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<PaymentForm />);
+    const submit = screen.getByRole('button', { name: /authorise/iu });
+
+    fireEvent.click(submit);
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByLabelText(/reference/iu), {
+      target: { value: 'ORD-999' },
+    });
+    fireEvent.click(submit);
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
+    const [firstKey, editedKey] = fetchMock.mock.calls.map(
+      ([, init]) =>
+        (JSON.parse(String(init?.body)) as Record<string, unknown>)
+          .idempotencyKey,
+    );
+    expect(editedKey).not.toBe(firstKey);
   });
 
   it('surfaces a transport error to the user', async () => {

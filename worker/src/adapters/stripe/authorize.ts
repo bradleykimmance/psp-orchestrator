@@ -61,6 +61,7 @@ export const stripeAuthorize = async (
     environment,
     '/payment_intents',
     authorizePayload(request),
+    request.idempotencyKey,
   );
 
   if (ok) {

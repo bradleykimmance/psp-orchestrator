@@ -60,7 +60,8 @@ for Stripe but goes through raw to Adyen.
   "amount": 4200,
   "currency": "GBP",
   "card": { "number": "5555555555554444", "expiry": "0330", "cvc": "737", "name": "Brad Test" },
-  "reference": "ORD-123"
+  "reference": "ORD-123",
+  "idempotencyKey": "7f0d0f2e-9d3a-4b6c-8a1e-2c5f4d7b9e01"
 }
 ```
 
@@ -72,6 +73,17 @@ for Stripe but goes through raw to Adyen.
 
 `status` is one of `authorised | refused | pending | error`, so the UI doesn't
 have to know about PSP-specific result codes.
+
+### Idempotency
+
+Every canonical request carries a browser-generated UUID that the Worker
+forwards to the PSP as the `Idempotency-Key` header (both Stripe and Adyen
+support it natively), so a retried request can never authorise twice. The
+key's lifecycle lives in the UI: it stays stable while the outcome is unknown
+(a submit that failed in transit, or a canonical `error`), so retrying is
+safe, and rotates on any form edit or once an attempt reaches a definitive
+outcome — Stripe rejects a reused key with different parameters, and a
+deliberate resubmit is a new payment.
 
 ## Running locally
 

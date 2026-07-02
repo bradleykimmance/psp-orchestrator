@@ -13,6 +13,7 @@ export const basicRequest = (
       number: '4242424242424242',
     },
     currency: 'GBP',
+    idempotencyKey: '7f0d0f2e-9d3a-4b6c-8a1e-2c5f4d7b9e01',
     psp: 'stripe' as const,
     reference: 'ORD-123',
   };
