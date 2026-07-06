@@ -22,8 +22,4 @@
 			"database_id": "79913c43-5165-4f5c-8468-9710a5ea9d09"
 		}
 	]
-	// Secrets - set once per environment, never committed:
-	//   wrangler secret put STRIPE_SECRET_KEY        # sk_test_...
-	//   wrangler secret put ADYEN_API_KEY
-	//   wrangler secret put ADYEN_MERCHANT_ACCOUNT
 }
