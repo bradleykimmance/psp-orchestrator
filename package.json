@@ -4,6 +4,7 @@
   "version": "0.5.0",
   "type": "module",
   "description": "Payments sandbox demonstrating the adapter / anti-corruption-layer pattern over Stripe and Adyen.",
+  "license": "MIT",
   "engines": {
     "node": "24.x.x",
     "npm": "11.x.x"
