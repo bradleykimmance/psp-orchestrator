@@ -5,6 +5,7 @@ export type Environment = {
   ADYEN_API_URL: string;
   ADYEN_MERCHANT_ACCOUNT: string;
   ALLOWED_ORIGIN: string;
+  paymentsDB: D1Database;
   STRIPE_API_URL: string;
   STRIPE_SECRET_KEY: string;
 };
