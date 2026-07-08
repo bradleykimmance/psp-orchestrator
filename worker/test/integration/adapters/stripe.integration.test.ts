@@ -1,20 +1,15 @@
 import { stripeAuthorize } from '../../../src/adapters/stripe/authorize.ts';
-import { basicRequest, unitTestEnvironment } from '../../helpers.ts';
-import process from 'node:process';
+import { basicRequest } from '../../helpers.ts';
+import { env } from 'cloudflare:workers';
 import { describe, expect, it } from 'vitest';
 
-const environment = {
-  ...unitTestEnvironment,
-  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY ?? '',
-};
-
-describe.skipIf(!process.env.STRIPE_SECRET_KEY)(
+describe.skipIf(!env.STRIPE_SECRET_KEY)(
   'stripe authorize (live sandbox)',
   () => {
     it('authorises a 4242 test card', async () => {
       const result = await stripeAuthorize(
         basicRequest({ idempotencyKey: crypto.randomUUID() }),
-        environment,
+        env,
       );
       expect(result.status).toBe('authorised');
       expect(result.pspReference).toMatch(/^pi_/u);
@@ -31,7 +26,7 @@ describe.skipIf(!process.env.STRIPE_SECRET_KEY)(
           },
           idempotencyKey: crypto.randomUUID(),
         }),
-        environment,
+        env,
       );
       expect(result.status).toBe('refused');
     });

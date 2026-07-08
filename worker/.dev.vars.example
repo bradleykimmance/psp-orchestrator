@@ -4,3 +4,6 @@
 STRIPE_SECRET_KEY=sk_test_replace_me
 ADYEN_API_KEY=replace_me
 ADYEN_MERCHANT_ACCOUNT=YourSandboxMerchantECOM
+ADYEN_HMAC_KEY=replace_me
+ADYEN_WEBHOOK_USER=user
+ADYEN_WEBHOOK_PASSWORD=password

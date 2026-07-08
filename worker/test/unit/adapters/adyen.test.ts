@@ -1,5 +1,6 @@
 import { adyenAdapter } from '../../../src/adapters/adyen';
-import { basicRequest, unitTestEnvironment } from '../../helpers.ts';
+import { basicRequest } from '../../helpers.ts';
+import { env } from 'cloudflare:workers';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const jsonResponse = (body: unknown, status: number): Response =>
@@ -44,10 +45,7 @@ describe('adyenAdapter authorize', () => {
       ),
     );
 
-    await adyenAdapter.authorize(
-      basicRequest({ psp: 'adyen' }),
-      unitTestEnvironment,
-    );
+    await adyenAdapter.authorize(basicRequest({ psp: 'adyen' }), env);
 
     const [url, init] = fetchMock.mock.calls[0] ?? [];
     expect(url).toBe('https://checkout-test.adyen.com/v71/payments');
@@ -88,7 +86,7 @@ describe('adyenAdapter authorize', () => {
 
     const result = await adyenAdapter.authorize(
       basicRequest({ psp: 'adyen' }),
-      unitTestEnvironment,
+      env,
     );
 
     expect(result).toMatchObject({
@@ -111,10 +109,7 @@ describe('adyenAdapter authorize', () => {
       ),
     );
 
-    const result = await adyenAdapter.authorize(
-      declineRequest(),
-      unitTestEnvironment,
-    );
+    const result = await adyenAdapter.authorize(declineRequest(), env);
 
     const [, init] = fetchMock.mock.calls[0] ?? [];
     const body: unknown = JSON.parse(String(init?.body));
@@ -145,7 +140,7 @@ describe('adyenAdapter authorize', () => {
 
     const result = await adyenAdapter.authorize(
       basicRequest({ psp: 'adyen' }),
-      unitTestEnvironment,
+      env,
     );
 
     expect(result).toMatchObject({

@@ -124,3 +124,17 @@ npm run build    # web production build
 committed. Secret values are not — set them with `wrangler secret put` and
 Cloudflare stores them encrypted. CI deploys with a `CLOUDFLARE_API_TOKEN` (plus
 `CLOUDFLARE_ACCOUNT_ID`); the PSP secrets never go into CI.
+
+| Secret                   | Purpose                                                                                                                |
+|--------------------------|------------------------------------------------------------------------------------------------------------------------|
+| `STRIPE_SECRET_KEY`      | Stripe test-mode API key (`sk_test_…`) used by the Stripe adapter                                                      |
+| `ADYEN_API_KEY`          | Adyen checkout-test API key, sent as `x-api-key` by the Adyen adapter                                                  |
+| `ADYEN_MERCHANT_ACCOUNT` | Adyen sandbox merchant account named in every `/payments` request                                                      |
+| `ADYEN_HMAC_KEY`         | Hex HMAC key from the Customer Area webhook config; verifies the `hmacSignature` on each incoming webhook notification |
+| `ADYEN_WEBHOOK_USER`     | Basic-auth username Adyen sends with each webhook delivery                                                             |
+| `ADYEN_WEBHOOK_PASSWORD` | Basic-auth password for the same                                                                                       |
+
+The three Adyen webhook secrets are configured in the Customer Area when
+creating the Standard webhook (Developers → Webhooks). Inbound webhook 
+requests are going to be rejected unless both the basic auth and the per-item
+HMAC signature check out.

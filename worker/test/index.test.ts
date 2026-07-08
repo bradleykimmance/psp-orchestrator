@@ -1,15 +1,6 @@
-import { type Environment } from '../src/environment.ts';
 import worker from '../src/index.ts';
+import { env } from 'cloudflare:workers';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-
-const environment = {
-  ADYEN_API_KEY: 'AQEv_test_key',
-  ADYEN_API_URL: 'https://checkout-test.adyen.com/v71',
-  ADYEN_MERCHANT_ACCOUNT: 'SandboxMerchantECOM',
-  ALLOWED_ORIGIN: '*',
-  STRIPE_API_URL: 'https://api.stripe.com/v1',
-  STRIPE_SECRET_KEY: 'sk_test_123',
-} satisfies Environment;
 
 const validBody = {
   amount: 4_200,
@@ -33,7 +24,7 @@ const post = (body: unknown): Request =>
   });
 
 const call = (request: Request): Promise<Response> =>
-  worker.fetch(request, environment);
+  worker.fetch(request, env);
 
 describe('worker route', () => {
   it('answers CORS preflight', async () => {

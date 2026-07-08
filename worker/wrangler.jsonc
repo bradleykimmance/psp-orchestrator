@@ -1,24 +1,25 @@
 {
-  // Committed IaC for the Worker. Secret *values* are never stored here - they
-  // are set with `wrangler secret put <NAME>` and live encrypted in Cloudflare.
-  // This file references them by name only (see the comment block below).
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "psp-orchestrator",
-  "main": "src/index.ts",
-  "compatibility_date": "2025-06-01",
-  "observability": {
-    "enabled": true
-  },
-
-  // Non-secret configuration, safe to commit.
-  "vars": {
-    "ADYEN_API_URL": "https://checkout-test.adyen.com/v71",
-    "STRIPE_API_URL": "https://api.stripe.com/v1",
-    "ALLOWED_ORIGIN": "https://payments.bradleykimmance.dev"
-  }
-
-  // Secrets - set once per environment, never committed:
-  //   wrangler secret put STRIPE_SECRET_KEY        # sk_test_...
-  //   wrangler secret put ADYEN_API_KEY
-  //   wrangler secret put ADYEN_MERCHANT_ACCOUNT
+	// Committed IaC for the Worker. Secret *values* are never stored here - they
+	// are set with `wrangler secret put <NAME>` and live encrypted in Cloudflare.
+	// This file references them by name only (see the comment block below).
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "psp-orchestrator",
+	"main": "src/index.ts",
+	"compatibility_date": "2025-06-01",
+	"observability": {
+		"enabled": true
+	},
+	// Non-secret configuration, safe to commit.
+	"vars": {
+		"ADYEN_API_URL": "https://checkout-test.adyen.com/v71",
+		"STRIPE_API_URL": "https://api.stripe.com/v1",
+		"ALLOWED_ORIGIN": "https://payments.bradleykimmance.dev"
+	},
+	"d1_databases": [
+		{
+			"binding": "paymentsDB",
+			"database_name": "psp-orchestrator",
+			"database_id": "79913c43-5165-4f5c-8468-9710a5ea9d09"
+		}
+	]
 }
