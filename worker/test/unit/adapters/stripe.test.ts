@@ -1,5 +1,6 @@
 import { stripeAdapter } from '../../../src/adapters/stripe';
-import { basicRequest, unitTestEnvironment } from '../../helpers.ts';
+import { basicRequest } from '../../helpers.ts';
+import { env } from 'cloudflare:workers';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const jsonResponse = (body: unknown, status: number): Response =>
@@ -34,7 +35,7 @@ describe('stripeAdapter authorize', () => {
       ),
     );
 
-    await stripeAdapter.authorize(basicRequest(), unitTestEnvironment);
+    await stripeAdapter.authorize(basicRequest(), env);
 
     const [url, init] = fetchMock.mock.calls[0] ?? [];
     expect(url).toBe('https://api.stripe.com/v1/payment_intents');
@@ -77,10 +78,7 @@ describe('stripeAdapter authorize', () => {
       ),
     );
 
-    const result = await stripeAdapter.authorize(
-      basicRequest(),
-      unitTestEnvironment,
-    );
+    const result = await stripeAdapter.authorize(basicRequest(), env);
 
     expect(result).toMatchObject({
       amount: 4_200,
@@ -106,10 +104,7 @@ describe('stripeAdapter authorize', () => {
       ),
     );
 
-    const result = await stripeAdapter.authorize(
-      basicRequest(),
-      unitTestEnvironment,
-    );
+    const result = await stripeAdapter.authorize(basicRequest(), env);
 
     expect(result).toMatchObject({
       errorCode: 'card_declined',
@@ -126,10 +121,7 @@ describe('stripeAdapter authorize', () => {
       ),
     );
 
-    const result = await stripeAdapter.authorize(
-      basicRequest(),
-      unitTestEnvironment,
-    );
+    const result = await stripeAdapter.authorize(basicRequest(), env);
 
     expect(result).toMatchObject({
       errorMessage: 'No such API key.',
