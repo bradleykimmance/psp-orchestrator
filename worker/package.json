@@ -7,6 +7,8 @@
     "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit",
     "types": "wrangler types",
+    "db:migrate": "wrangler d1 migrations apply psp-orchestrator --remote",
+    "db:migrate:local": "wrangler d1 migrations apply psp-orchestrator --local",
     "test": "vitest run",
     "test:integration": "vitest run --project integration"
   },
