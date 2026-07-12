@@ -1,5 +1,6 @@
 import { adapters } from './adapters';
 import { type Environment } from './environment.ts';
+import { logError, logInfo } from './log.ts';
 import { CanonicalRequestSchema } from 'shared/canonical';
 
 const corsHeaders = (environment: Environment): Record<string, string> => ({
@@ -39,6 +40,9 @@ export default {
 
     const parsed = CanonicalRequestSchema.safeParse(payload);
     if (!parsed.success) {
+      logError('Invalid request payload', {
+        issues: parsed.error.issues.length,
+      });
       return json(
         { error: 'Validation failed', issues: parsed.error.issues },
         422,
@@ -49,14 +53,30 @@ export default {
     const adapter = adapters[parsed.data.psp];
     try {
       const result = await adapter.authorize(parsed.data, environment);
+
+      logInfo('Authorize result', {
+        idempotencyKey: parsed.data.idempotencyKey,
+        psp: parsed.data.psp,
+        pspReference: result.pspReference ?? null,
+        reference: parsed.data.reference,
+        status: result.status,
+      });
+
       return json(result, 200, cors);
     } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+
+      logError('Authorize failed', {
+        idempotencyKey: parsed.data.idempotencyKey,
+        message,
+        psp: parsed.data.psp,
+        reference: parsed.data.reference,
+      });
+
       return json(
         {
           pspReference: null,
-          rawResponse: {
-            message: error instanceof Error ? error.message : String(error),
-          },
+          rawResponse: { message },
           status: 'error',
         },
         502,
