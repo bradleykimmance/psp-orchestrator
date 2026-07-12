@@ -1,7 +1,12 @@
 import { adapters } from './adapters';
 import { type Environment } from './environment.ts';
 import { logError, logInfo } from './log.ts';
-import { CanonicalRequestSchema } from 'shared/canonical';
+import { recordPaymentAttempt } from './storage/payments.ts';
+import {
+  type CanonicalRequest,
+  CanonicalRequestSchema,
+  type CanonicalResponse,
+} from 'shared/canonical';
 
 const corsHeaders = (environment: Environment): Record<string, string> => ({
   'access-control-allow-headers': 'content-type',
@@ -15,7 +20,22 @@ const json = (
   headers: Record<string, string>,
 ): Response => Response.json(body, { headers, status });
 
-// Validate, pick the adapter, return its canonical response.
+const persist = async (
+  environment: Environment,
+  request: CanonicalRequest,
+  response: Pick<CanonicalResponse, 'pspReference' | 'status'>,
+): Promise<void> => {
+  try {
+    await recordPaymentAttempt(environment.paymentsDB, request, response);
+  } catch (error) {
+    logError('Failed to persist payment information', {
+      idempotencyKey: request.idempotencyKey,
+      message: error instanceof Error ? error.message : String(error),
+    });
+  }
+};
+
+// Validate, pick the adapter, persist the outcome, return the canonical response.
 export default {
   fetch: async (
     request: Request,
@@ -62,6 +82,8 @@ export default {
         status: result.status,
       });
 
+      await persist(environment, parsed.data, result);
+
       return json(result, 200, cors);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -71,6 +93,11 @@ export default {
         message,
         psp: parsed.data.psp,
         reference: parsed.data.reference,
+      });
+
+      await persist(environment, parsed.data, {
+        pspReference: null,
+        status: 'error',
       });
 
       return json(

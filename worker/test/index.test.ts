@@ -62,6 +62,7 @@ describe('worker route', () => {
     );
     vi.stubGlobal('fetch', fetchMock);
 
+    const idempotencyKey = crypto.randomUUID();
     const response = await call(
       post({
         ...validBody,
@@ -71,6 +72,7 @@ describe('worker route', () => {
           name: 'Brad Test',
           number: '5555555555554444',
         },
+        idempotencyKey,
         psp: 'adyen',
       }),
     );
@@ -80,6 +82,73 @@ describe('worker route', () => {
       pspReference: 'ADYEN_ROUTED',
       status: 'authorised',
     });
+
+    // The sync outcome is persisted, awaiting webhook confirmation.
+    const row = await env.paymentsDB
+      .prepare('SELECT * FROM payments WHERE idempotency_key = ?1')
+      .bind(idempotencyKey)
+      .first();
+    expect(row).toMatchObject({
+      amount: 4_200,
+      psp: 'adyen',
+      psp_reference: 'ADYEN_ROUTED',
+      status: 'authorised',
+      webhook_confirmed_at: null,
+    });
+  });
+
+  it('stores one payment row when the same idempotency key is posted twice', async () => {
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(
+      Response.json(
+        {
+          merchantReference: 'ORD-123',
+          pspReference: 'ADYEN_REPLAYED',
+          resultCode: 'Authorised',
+        },
+        { status: 200 },
+      ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const idempotencyKey = crypto.randomUUID();
+    const body = {
+      ...validBody,
+      card: {
+        cvc: '737',
+        expiry: '0327',
+        name: 'Brad Test',
+        number: '5555555555554444',
+      },
+      idempotencyKey,
+      psp: 'adyen',
+    };
+    await call(post(body));
+    await call(post(body));
+
+    const row = await env.paymentsDB
+      .prepare(
+        'SELECT count(*) AS total FROM payments WHERE idempotency_key = ?1',
+      )
+      .bind(idempotencyKey)
+      .first();
+    expect(row?.total).toBe(1);
+  });
+
+  it('records an error row when the adapter throws, so a retry can heal it', async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockRejectedValue(new Error('socket hang up'));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const idempotencyKey = crypto.randomUUID();
+    const response = await call(post({ ...validBody, idempotencyKey }));
+    expect(response.status).toBe(502);
+
+    const row = await env.paymentsDB
+      .prepare('SELECT * FROM payments WHERE idempotency_key = ?1')
+      .bind(idempotencyKey)
+      .first();
+    expect(row).toMatchObject({ psp_reference: null, status: 'error' });
   });
 });
 

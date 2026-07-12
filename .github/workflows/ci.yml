@@ -22,5 +22,7 @@ jobs:
     - run: npm run lint
     - run: npm test
       env:
+        ADYEN_API_KEY: ${{ secrets.ADYEN_API_KEY }}
+        ADYEN_MERCHANT_ACCOUNT: ${{ secrets.ADYEN_MERCHANT_ACCOUNT }}
         STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
     - run: npm run build
