@@ -7,7 +7,10 @@
 	"main": "src/index.ts",
 	"compatibility_date": "2025-06-01",
 	"observability": {
-		"enabled": true
+		"enabled": true,
+		"traces": {
+			"enabled": true
+		}
 	},
 	// Non-secret configuration, safe to commit.
 	"vars": {

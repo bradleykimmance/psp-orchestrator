@@ -99,6 +99,7 @@ Worker (needs your own sandbox credentials):
 ```bash
 cd worker
 cp .dev.vars.example .dev.vars   # STRIPE_SECRET_KEY, ADYEN_API_KEY, ADYEN_MERCHANT_ACCOUNT
+npm run db:migrate:local         # Setup local database
 npm run dev                      # http://localhost:8787
 ```
 

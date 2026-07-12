@@ -24,6 +24,13 @@ jobs:
           node-version: '24'
           cache: 'npm'
       - run: npm ci
+      - name: Apply D1 migrations
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: worker
+          command: d1 migrations apply psp-orchestrator --remote
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v3
         with:
