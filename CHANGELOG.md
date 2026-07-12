@@ -1,3 +1,13 @@
+# [0.7.0](https://github.com/bradleykimmance/psp-orchestrator/compare/v0.6.0...v0.7.0) (2026-07-12)
+
+
+### Features
+
+* persist payment attempts to D1 ([24349fc](https://github.com/bradleykimmance/psp-orchestrator/commit/24349fc5b3b58da56b94d68f9831424be4118e67))
+* **worker:** add structured logging ([3ec57ef](https://github.com/bradleykimmance/psp-orchestrator/commit/3ec57ef893f9a5c0d9691fdaf99d5c8e4af1ff8a))
+
+
+
 # [0.6.0](https://github.com/bradleykimmance/psp-orchestrator/compare/v0.5.0...v0.6.0) (2026-07-08)
 
 
@@ -39,21 +49,6 @@
 ### Bug Fixes
 
 * **web:** show zod specific errors on frontend ([0b8d539](https://github.com/bradleykimmance/psp-orchestrator/commit/0b8d539b2b06bbed7df29f318248904692935868))
-
-
-
-# [0.3.0](https://github.com/bradleykimmance/psp-orchestrator/compare/v0.2.0...v0.3.0) (2026-06-20)
-
-
-### Bug Fixes
-
-* pass error code/message and amount/currency to canonical result ([d02e6bc](https://github.com/bradleykimmance/psp-orchestrator/commit/d02e6bc44e438ed50f94ba379a3ea85ef835cf18))
-
-
-### Features
-
-* **web:** add amex test card ([1185d49](https://github.com/bradleykimmance/psp-orchestrator/commit/1185d49171f18fe828946e3ffbd2ade0a3f9dbb0))
-* **worker:** add stripe auth request with payment method and test suite ([cf15142](https://github.com/bradleykimmance/psp-orchestrator/commit/cf1514243c1e01df31e4071433c9660663141889))
 
 
 
